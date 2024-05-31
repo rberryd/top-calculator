@@ -38,6 +38,8 @@
 
     font-size: 2.5rem;
     text-align: center;
+
+    pointer-events: none;
 }
 
 .btn-container {
@@ -57,6 +59,9 @@
     border-radius: 1rem;
 
     background: rgb(165, 165, 165);
+
+    font-size: 1.5rem;
+    font-weight: bold;
 
     cursor: pointer;
 }
