@@ -1,47 +1,111 @@
-let buttons = document.querySelectorAll('.input-btn');
-let input = document.querySelector('#numInput');
+const buttons = document.querySelectorAll('button');
+const input = document.querySelector('input');
+const currentOp = document.querySelector('.current-op');
 
-const operators = ['+', '-', 'x', '÷'];
+let num1 = '';
+let step = 0;
+let op = '';
 
-for(const button of buttons) {
-    button.addEventListener('click', function() {
-        switch(button.textContent) {
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
+for(const btn of buttons) {
+    btn.addEventListener('click', function() {
+      switch(true) {
+        case btn.classList.contains('num'):
+            assignNumber(this.textContent);
+            break;
+        case btn.classList.contains('zero'):
+            if(input.value != 0) {
                 input.value += this.textContent;
+            }
+            break;
+        case btn.classList.contains('decimal'):
+            if(!/[.]/g.test(input.value)) {
+                input.value += this.textContent;
+            }
+            break;
+        case btn.classList.contains('delete'):
+            deleteNum('delete');
+            break;
+        case btn.classList.contains('clear'):
+            deleteNum('clear');
+            break;
+        case btn.classList.contains('operator'):
+            assignOperator(this.textContent);
+            break;
+        case btn.classList.contains('equal'):
+            if(step === 2) {
+                step = 0;
+                operate(parseFloat(num1), parseFloat(input.value), op);
+                input.value = num1;
+                currentOp.textContent = '';
+            }
+            break;
+        case btn.classList.contains('convert'):
+            if(input.value == '0') {
                 break;
-            case '0':
-                if(!input.value == '') {
-                    input.value += this.textContent;
-                }
-                break;
-            case '.':
-                if(input.value == '') {
-                    input.value += `0${this.textContent}`;
-                } else if(!input.value.includes('.')) {
-                    input.value += this.textContent;
-                }
-                break;
-            case '=':
-                operate(input.value);
-                break;
-            case 'Clear':
-                input.value = '';
-                break;
-            case 'Delete':
-                if(input.value == '0.') {
-                    input.value = '';
-                } else if(input.value.length > 0) {
-                    input.value = input.value.replace(input.value[input.value.length - 1], "");
-                }
-                break;
-        }
+            } else if(!/[-]/g.test(input.value)) {
+                input.value = `-${input.value}`;
+            } else {
+                input.value = input.value.replace('-', '');
+            }
+            break;
+      }
     });
+}
+
+function assignNumber(num) {
+    if(step === 0) {
+        if(input.value === '0') {
+            input.value = num;
+        } else {
+            input.value += num;
+        }
+    } else if(step === 1) {
+        step = 2;
+        input.value = num;
+    } else if(step === 2) {
+        input.value += num;
+    }
+}
+
+function assignOperator(operator) {
+    if(step === 0 && input.value != '0') {
+        step = 1;
+        num1 = input.value;
+        input.value = '';
+        op = operator;
+        currentOp.textContent = `${num1}${operator}`;
+    } else if(step === 2) {
+        operate(parseFloat(num1), parseFloat(input.value), op);
+        input.value = '';
+        currentOp.textContent = `${num1}${operator}`;
+        op = operator;
+    }
+}
+
+function operate(firstNum, secondNum, operator) {
+    if(operator === '+') {
+        num1 = firstNum + secondNum;
+    } else if(operator === '-') {
+        num1 = firstNum - secondNum;
+    } else if(operator === '*') {
+        num1 = firstNum * secondNum;
+    } else if(operator === '/') {
+        num1 = firstNum / secondNum;
+    }
+}
+
+function deleteNum(option) {
+    if(option === 'clear') {
+        input.value = '0';
+        num1 = '';
+        step = 0;
+        op = '';
+        currentOp.textContent = '';
+    } else if(option === 'delete') {
+        if(input.value.length == 1) {
+            input.value = '0';
+        } else {
+            input.value = input.value.replace(input.value[input.value.length - 1], '');
+        }
+    }
 }
